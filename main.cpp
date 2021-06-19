@@ -116,7 +116,7 @@ struct FLDBFileEntry {
 		
 		// create destination file
 		FILE* g = fopen(path, "wb");
-		if(g == NULL) {
+		if(g == nullptr) {
 			return false;
 		}
 		
@@ -125,19 +125,19 @@ struct FLDBFileEntry {
 			read_size = min(work_size, (DWORD)BUFFER_SIZE);
 			if(fread(buffer, read_size, 1, f) != 1) {
 				fclose(g);
-				g = NULL;
+				g = nullptr;
 				return false;
 			}
 			if(fwrite(buffer, read_size, 1, g) != 1) {
 				fclose(g);
-				g = NULL;
+				g = nullptr;
 				return false;
 			}
 		}
 		
 		// close file & free memory
 		fclose(g);
-		g = NULL;
+		g = nullptr;
 		return true;
 	}
 };
@@ -202,8 +202,8 @@ int main (int argc, char * const argv[]) {
 	bool verbose = false;
 	bool extract = false;
 	bool html = false;
-	const char* db_filename = NULL;
-	const char* output_path = NULL;
+	const char* db_filename = nullptr;
+	const char* output_path = nullptr;
 	
 	// check arguments
 	PrintBanner();
@@ -233,7 +233,7 @@ int main (int argc, char * const argv[]) {
 
 	// open database
 	FILE* f = fopen(db_filename, "rb");
-	if(f == NULL) {
+	if(f == nullptr) {
 		fprintf(stderr, "ERROR: unable to open '%s'\n", db_filename);
 		return -1;
 	}
@@ -242,7 +242,9 @@ int main (int argc, char * const argv[]) {
 	FLDBHeader header;
 	if(!header.Read(f)) {
 		printf("ERROR: '%s' is not an FLDB file\n", db_filename);
-		goto done_close;
+    	fclose(f);
+	    f = nullptr;
+        return -1;
 	}
 	if(verbose) {
 		printf("Successfully opened '%s'\n", db_filename);
@@ -289,12 +291,12 @@ int main (int argc, char * const argv[]) {
 	exit_code = 0;
 done_mem_release:
 	delete[] entries;
-	entries = NULL;
+	entries = nullptr;
 
 done_close:
 	// close file
 	fclose(f);
-	f = NULL;
+	f = nullptr;
 
     return exit_code;
 }
