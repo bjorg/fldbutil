@@ -241,10 +241,10 @@ int main (int argc, char * const argv[]) {
 	// read header
 	FLDBHeader header;
 	if(!header.Read(f)) {
-		printf("ERROR: '%s' is not an FLDB file\n", db_filename);
-    	fclose(f);
+            printf("ERROR: '%s' is not an FLDB file\n", db_filename);
+            fclose(f);
 	    f = nullptr;
-        return -1;
+            return -1;
 	}
 	if(verbose) {
 		printf("Successfully opened '%s'\n", db_filename);
