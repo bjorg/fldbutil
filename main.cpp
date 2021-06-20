@@ -56,15 +56,15 @@ inline void SetFullPath(char* fullpath, const char* basepath, const char* filena
 struct FLDBHeader {
 
 	//--- Fields ---
-	DWORD	headerLen;	    // header length, always 0x220
-	DWORD	_unknown_2;  	// always 0x01
-	DWORD	timestamp;	    // compile timestamp, as epoch	
-	DWORD	Count;          // number of files in archive
-	DWORD	_unknown_4;     // probably data version, so far always 0x24 (36)
-	char	Magic[4];       // the 'FLDB'
-    DWORD   _unknown_5;     // always 0x00
-    DWORD   _unknown6;      // so far always 0x00
-	char	comment[512];   // file comment, multiline, zero-terminated
+	DWORD	headerLen;		// header length, always 0x220
+	DWORD	_unknown_2;		// always 0x01
+	DWORD	timestamp;		// compile timestamp, as epoch	
+	DWORD	Count;			// number of files in archive
+	DWORD	_unknown_4;	 	// probably data version, so far always 0x24 (36)
+	char	Magic[4];		// the 'FLDB'
+	DWORD	_unknown_5;	 	// always 0x00
+	DWORD	_unknown6;		// so far always 0x00
+	char	comment[512];	// file comment, multiline, zero-terminated
 	
 	//--- Methods ---
 	bool Read(FILE* f) {
@@ -243,10 +243,10 @@ int main (int argc, char * const argv[]) {
 	// read header
 	FLDBHeader header;
 	if(!header.Read(f)) {
-            printf("ERROR: '%s' is not an FLDB file\n", db_filename);
-            fclose(f);
-	    f = nullptr;
-            return -1;
+			printf("ERROR: '%s' is not an FLDB file\n", db_filename);
+			fclose(f);
+			f = nullptr;
+			return -1;
 	}
 	if(verbose) {
 		printf("Successfully opened '%s'\n", db_filename);
@@ -276,7 +276,7 @@ int main (int argc, char * const argv[]) {
 
 			// compute destination path
 			char fullpath[256];
-			SetFullPath(fullpath,  output_path, entries[i].Name);
+			SetFullPath(fullpath, output_path, entries[i].Name);
 
 			// extracting
 			printf("Extracting '%s'...", fullpath);
@@ -300,5 +300,5 @@ done_close:
 	fclose(f);
 	f = nullptr;
 
-    return exit_code;
+	return exit_code;
 }
