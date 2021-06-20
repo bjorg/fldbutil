@@ -56,13 +56,15 @@ inline void SetFullPath(char* fullpath, const char* basepath, const char* filena
 struct FLDBHeader {
 
 	//--- Fields ---
-	DWORD	_unknown_1;
-	DWORD	_unknown_2;
-	DWORD	_unknown_3;
-	DWORD	Count;
-	DWORD	_unknown_4;
-	char	Magic[4];
-	char	_unknown_5[520];
+	DWORD	headerLen;	    // header length, always 0x220
+	DWORD	_unknown_2;  	// always 0x01
+	DWORD	timestamp;	    // compile timestamp, as epoch	
+	DWORD	Count;          // number of files in archive
+	DWORD	_unknown_4;     // probably data version, so far always 0x24 (36)
+	char	Magic[4];       // the 'FLDB'
+    DWORD   _unknown_5;     // always 0x00
+    DWORD   _unknown6;      // so far always 0x00
+	char	comment[512];   // file comment, multiline, zero-terminated
 	
 	//--- Methods ---
 	bool Read(FILE* f) {
