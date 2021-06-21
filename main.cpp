@@ -56,13 +56,15 @@ inline void SetFullPath(char* fullpath, const char* basepath, const char* filena
 struct FLDBHeader {
 
 	//--- Fields ---
-	DWORD	_unknown_1;
-	DWORD	_unknown_2;
-	DWORD	_unknown_3;
-	DWORD	Count;
-	DWORD	_unknown_4;
-	char	Magic[4];
-	char	_unknown_5[520];
+	DWORD	headerLen;		// header length, always 0x220
+	DWORD	_unknown_2;		// always 0x01
+	DWORD	timestamp;		// compile timestamp, as epoch	
+	DWORD	Count;			// number of files in archive
+	DWORD	_unknown_4;	 	// probably data version, so far always 0x24 (36)
+	char	Magic[4];		// the 'FLDB'
+	DWORD	_unknown_5;	 	// always 0x00
+	DWORD	_unknown6;		// so far always 0x00
+	char	comment[512];	// file comment, multiline, zero-terminated
 	
 	//--- Methods ---
 	bool Read(FILE* f) {
@@ -116,7 +118,7 @@ struct FLDBFileEntry {
 		
 		// create destination file
 		FILE* g = fopen(path, "wb");
-		if(g == NULL) {
+		if(g == nullptr) {
 			return false;
 		}
 		
@@ -125,19 +127,19 @@ struct FLDBFileEntry {
 			read_size = min(work_size, (DWORD)BUFFER_SIZE);
 			if(fread(buffer, read_size, 1, f) != 1) {
 				fclose(g);
-				g = NULL;
+				g = nullptr;
 				return false;
 			}
 			if(fwrite(buffer, read_size, 1, g) != 1) {
 				fclose(g);
-				g = NULL;
+				g = nullptr;
 				return false;
 			}
 		}
 		
 		// close file & free memory
 		fclose(g);
-		g = NULL;
+		g = nullptr;
 		return true;
 	}
 };
@@ -202,8 +204,8 @@ int main (int argc, char * const argv[]) {
 	bool verbose = false;
 	bool extract = false;
 	bool html = false;
-	const char* db_filename = NULL;
-	const char* output_path = NULL;
+	const char* db_filename = nullptr;
+	const char* output_path = nullptr;
 	
 	// check arguments
 	PrintBanner();
@@ -233,7 +235,7 @@ int main (int argc, char * const argv[]) {
 
 	// open database
 	FILE* f = fopen(db_filename, "rb");
-	if(f == NULL) {
+	if(f == nullptr) {
 		fprintf(stderr, "ERROR: unable to open '%s'\n", db_filename);
 		return -1;
 	}
@@ -241,8 +243,10 @@ int main (int argc, char * const argv[]) {
 	// read header
 	FLDBHeader header;
 	if(!header.Read(f)) {
-		printf("ERROR: '%s' is not an FLDB file\n", db_filename);
-		goto done_close;
+			printf("ERROR: '%s' is not an FLDB file\n", db_filename);
+			fclose(f);
+			f = nullptr;
+			return -1;
 	}
 	if(verbose) {
 		printf("Successfully opened '%s'\n", db_filename);
@@ -272,7 +276,7 @@ int main (int argc, char * const argv[]) {
 
 			// compute destination path
 			char fullpath[256];
-			SetFullPath(fullpath,  output_path, entries[i].Name);
+			SetFullPath(fullpath, output_path, entries[i].Name);
 
 			// extracting
 			printf("Extracting '%s'...", fullpath);
@@ -289,12 +293,12 @@ int main (int argc, char * const argv[]) {
 	exit_code = 0;
 done_mem_release:
 	delete[] entries;
-	entries = NULL;
+	entries = nullptr;
 
 done_close:
 	// close file
 	fclose(f);
-	f = NULL;
+	f = nullptr;
 
-    return exit_code;
+	return exit_code;
 }
